@@ -1,8 +1,8 @@
 ﻿using System;
 
 namespace protobuf {
-    class Program {
-        static void Main(string[] args) {
+    internal static class Program {
+        public static void Main() {
             Console.WriteLine("Hello World!");
         }
     }
