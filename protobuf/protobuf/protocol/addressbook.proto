@@ -3,7 +3,7 @@ package tutorial;
 
 import "google/protobuf/timestamp.proto";
 
-option csharp_namespace = "Protobuf.Protocol";
+option csharp_namespace = "Protocol.Protobuf";
 
 message Person {
   string name = 1;
