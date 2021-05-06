@@ -25,19 +25,19 @@ namespace Protocol.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChFhZGRyZXNzYm9vay5wcm90bxIIdHV0b3JpYWwaH2dvb2dsZS9wcm90b2J1",
-            "Zi90aW1lc3RhbXAucHJvdG8ijAIKBlBlcnNvbhIMCgRuYW1lGAEgASgJEgoK",
-            "AmlkGAIgASgFEg0KBWVtYWlsGAMgASgJEjIKDHBob25lTnVtYmVycxgEIAMo",
-            "CzIcLnR1dG9yaWFsLlBlcnNvbi5QaG9uZU51bWJlchIvCgtsYXN0VXBkYXRl",
-            "ZBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAaRwoLUGhvbmVO",
-            "dW1iZXISDgoGbnVtYmVyGAEgASgJEigKBHR5cGUYAiABKA4yGi50dXRvcmlh",
-            "bC5QZXJzb24uUGhvbmVUeXBlIisKCVBob25lVHlwZRIKCgZNT0JJTEUQABII",
-            "CgRIT01FEAESCAoEV09SSxACIi8KC0FkZHJlc3NCb29rEiAKBnBlb3BsZRgB",
-            "IAMoCzIQLnR1dG9yaWFsLlBlcnNvbkIUqgIRUHJvdG9jb2wuUHJvdG9idWZi",
-            "BnByb3RvMw=="));
+            "Zi90aW1lc3RhbXAucHJvdG8ijgIKBlBlcnNvbhIMCgRuYW1lGAEgASgJEgoK",
+            "AmlkGAIgASgFEjIKDHBob25lTnVtYmVycxgEIAMoCzIcLnR1dG9yaWFsLlBl",
+            "cnNvbi5QaG9uZU51bWJlchIvCgtsYXN0VXBkYXRlZBgFIAEoCzIaLmdvb2ds",
+            "ZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHYWRkcmVzcxgGIAEoCRpHCgtQaG9u",
+            "ZU51bWJlchIOCgZudW1iZXIYASABKAkSKAoEdHlwZRgCIAEoDjIaLnR1dG9y",
+            "aWFsLlBlcnNvbi5QaG9uZVR5cGUiKwoJUGhvbmVUeXBlEgoKBk1PQklMRRAA",
+            "EggKBEhPTUUQARIICgRXT1JLEAIiLwoLQWRkcmVzc0Jvb2sSIAoGcGVvcGxl",
+            "GAEgAygLMhAudHV0b3JpYWwuUGVyc29uQhSqAhFQcm90b2NvbC5Qcm90b2J1",
+            "ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Protobuf.Person), global::Protocol.Protobuf.Person.Parser, new[]{ "Name", "Id", "Email", "PhoneNumbers", "LastUpdated" }, null, new[]{ typeof(global::Protocol.Protobuf.Person.Types.PhoneType) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Protobuf.Person.Types.PhoneNumber), global::Protocol.Protobuf.Person.Types.PhoneNumber.Parser, new[]{ "Number", "Type" }, null, null, null, null)}),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Protobuf.Person), global::Protocol.Protobuf.Person.Parser, new[]{ "Name", "Id", "PhoneNumbers", "LastUpdated", "Address" }, null, new[]{ typeof(global::Protocol.Protobuf.Person.Types.PhoneType) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Protobuf.Person.Types.PhoneNumber), global::Protocol.Protobuf.Person.Types.PhoneNumber.Parser, new[]{ "Number", "Type" }, null, null, null, null)}),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Protobuf.AddressBook), global::Protocol.Protobuf.AddressBook.Parser, new[]{ "People" }, null, null, null, null)
           }));
     }
@@ -76,9 +76,9 @@ namespace Protocol.Protobuf {
     public Person(Person other) : this() {
       name_ = other.name_;
       id_ = other.id_;
-      email_ = other.email_;
       phoneNumbers_ = other.phoneNumbers_.Clone();
       lastUpdated_ = other.lastUpdated_ != null ? other.lastUpdated_.Clone() : null;
+      address_ = other.address_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -101,22 +101,14 @@ namespace Protocol.Protobuf {
     /// <summary>Field number for the "id" field.</summary>
     public const int IdFieldNumber = 2;
     private int id_;
+    /// <summary>
+    ///  string email = 3;
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int Id {
       get { return id_; }
       set {
         id_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "email" field.</summary>
-    public const int EmailFieldNumber = 3;
-    private string email_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Email {
-      get { return email_; }
-      set {
-        email_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -141,6 +133,17 @@ namespace Protocol.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "address" field.</summary>
+    public const int AddressFieldNumber = 6;
+    private string address_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Address {
+      get { return address_; }
+      set {
+        address_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as Person);
@@ -156,9 +159,9 @@ namespace Protocol.Protobuf {
       }
       if (Name != other.Name) return false;
       if (Id != other.Id) return false;
-      if (Email != other.Email) return false;
       if(!phoneNumbers_.Equals(other.phoneNumbers_)) return false;
       if (!object.Equals(LastUpdated, other.LastUpdated)) return false;
+      if (Address != other.Address) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -167,9 +170,9 @@ namespace Protocol.Protobuf {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (Id != 0) hash ^= Id.GetHashCode();
-      if (Email.Length != 0) hash ^= Email.GetHashCode();
       hash ^= phoneNumbers_.GetHashCode();
       if (lastUpdated_ != null) hash ^= LastUpdated.GetHashCode();
+      if (Address.Length != 0) hash ^= Address.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -194,14 +197,14 @@ namespace Protocol.Protobuf {
         output.WriteRawTag(16);
         output.WriteInt32(Id);
       }
-      if (Email.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Email);
-      }
       phoneNumbers_.WriteTo(output, _repeated_phoneNumbers_codec);
       if (lastUpdated_ != null) {
         output.WriteRawTag(42);
         output.WriteMessage(LastUpdated);
+      }
+      if (Address.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Address);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -220,14 +223,14 @@ namespace Protocol.Protobuf {
         output.WriteRawTag(16);
         output.WriteInt32(Id);
       }
-      if (Email.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Email);
-      }
       phoneNumbers_.WriteTo(ref output, _repeated_phoneNumbers_codec);
       if (lastUpdated_ != null) {
         output.WriteRawTag(42);
         output.WriteMessage(LastUpdated);
+      }
+      if (Address.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(Address);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -244,12 +247,12 @@ namespace Protocol.Protobuf {
       if (Id != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
       }
-      if (Email.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Email);
-      }
       size += phoneNumbers_.CalculateSize(_repeated_phoneNumbers_codec);
       if (lastUpdated_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(LastUpdated);
+      }
+      if (Address.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Address);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -268,15 +271,15 @@ namespace Protocol.Protobuf {
       if (other.Id != 0) {
         Id = other.Id;
       }
-      if (other.Email.Length != 0) {
-        Email = other.Email;
-      }
       phoneNumbers_.Add(other.phoneNumbers_);
       if (other.lastUpdated_ != null) {
         if (lastUpdated_ == null) {
           LastUpdated = new global::Google.Protobuf.WellKnownTypes.Timestamp();
         }
         LastUpdated.MergeFrom(other.LastUpdated);
+      }
+      if (other.Address.Length != 0) {
+        Address = other.Address;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -300,10 +303,6 @@ namespace Protocol.Protobuf {
             Id = input.ReadInt32();
             break;
           }
-          case 26: {
-            Email = input.ReadString();
-            break;
-          }
           case 34: {
             phoneNumbers_.AddEntriesFrom(input, _repeated_phoneNumbers_codec);
             break;
@@ -313,6 +312,10 @@ namespace Protocol.Protobuf {
               LastUpdated = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
             input.ReadMessage(LastUpdated);
+            break;
+          }
+          case 50: {
+            Address = input.ReadString();
             break;
           }
         }
@@ -337,10 +340,6 @@ namespace Protocol.Protobuf {
             Id = input.ReadInt32();
             break;
           }
-          case 26: {
-            Email = input.ReadString();
-            break;
-          }
           case 34: {
             phoneNumbers_.AddEntriesFrom(ref input, _repeated_phoneNumbers_codec);
             break;
@@ -350,6 +349,10 @@ namespace Protocol.Protobuf {
               LastUpdated = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
             input.ReadMessage(LastUpdated);
+            break;
+          }
+          case 50: {
+            Address = input.ReadString();
             break;
           }
         }

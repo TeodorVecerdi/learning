@@ -8,7 +8,7 @@ option csharp_namespace = "Protocol.Protobuf";
 message Person {
   string name = 1;
   int32 id = 2;
-  string email = 3;
+  //  string email = 3;
 
   enum PhoneType {
     MOBILE = 0;
@@ -24,6 +24,8 @@ message Person {
   repeated PhoneNumber phoneNumbers = 4;
 
   google.protobuf.Timestamp lastUpdated = 5;
+
+  string address = 6;
 }
 
 message AddressBook {

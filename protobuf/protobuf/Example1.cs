@@ -10,7 +10,7 @@ namespace protobuf {
             var john = new Person {
                 Id = 1234,
                 Name = "John Doe",
-                Email = "doe@mail.com",
+                // Email = "doe@mail.com",
                 PhoneNumbers = {
                     new PhoneNumber {
                         Number = "123-4567",
