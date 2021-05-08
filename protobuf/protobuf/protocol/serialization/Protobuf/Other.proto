@@ -1,0 +1,74 @@
+﻿syntax = "proto3";
+package protocol;
+option csharp_namespace = "Protocol.Protobuf";
+
+import "Basic.proto";
+
+message PlayerData {
+  string name = 1;
+  Transform transform = 2;
+  
+  uint32 experience = 3;
+  uint32 maxExperience = 4;
+  uint32 level = 5;
+  
+  Inventory inventory = 999;
+}
+
+message Inventory {
+  repeated ItemStack items = 1;
+}
+
+message ItemStack {
+  ItemData item = 1;
+  uint32 count = 2;
+}
+
+message ItemData {
+  enum ItemType {
+    ARMOR = 0;
+    WEAPON = 1;
+    POTION = 2;
+  }
+
+  string name = 1;
+  ItemType type = 2;
+  oneof stats {
+    ArmorStats armorStats = 3;
+    WeaponStats weaponStats = 4;
+    PotionStats potionStats = 5;
+  }
+}
+
+message ArmorStats {
+  BaseItemStats baseStats = 1;
+  uint32 protection = 2;
+  float blockChance = 3;
+}
+
+message WeaponStats {
+  BaseItemStats baseStats = 1;
+  uint32 damage = 2;
+  float critChance = 3;
+}
+
+message PotionStats {
+  BaseItemStats baseStats = 1;
+  uint64 durationMs = 2;
+  uint32 statusEffect = 3;
+  float statusMultiplier = 4;
+}
+
+message BaseItemStats {
+  enum Rarity {
+    COMMON = 0;
+    UNCOMMON = 1;
+    RARE = 2;
+    LEGENDARY = 3;
+  }
+
+  uint32 durability = 1;
+  uint32 maxDurability = 2;
+  uint32 level = 3;
+  Rarity rarity = 4;
+}
