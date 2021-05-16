@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Serialization;
 using SerializationSystem.Logging;
 
 namespace SerializationSystem.Internal {
@@ -13,17 +14,30 @@ namespace SerializationSystem.Internal {
         internal static TypeId Get(Type type) => cache.GetCached(type);
         internal static TypeId Get(string name) => cache.GetCached(name);
 
+        private const string kTypeNotFoundFormat = "Could not find type {0} in any loaded or referenced assembly.";
+        private const string kTypeCacheNotCreated = "Could not create type cache.";
+        private const string kNonExistentTypeSetNotCreated = "Could not create non existent type set.";
+
         private static ConcurrentDictionary<string, Type> typeCache;
+        private static ConcurrentSet<string> nonExistentTypes;
+        private static ConcurrentSet<Assembly> loadedAssemblies;
         internal static Type FindTypeByName(string name) => FindTypeByName(name, false); 
         internal static Type FindTypeByName(string name, bool suppressErrors) {
-            if(typeCache == null) typeCache = new ConcurrentDictionary<string, Type>();
+            typeCache ??= new ConcurrentDictionary<string, Type>();
+            nonExistentTypes ??= new ConcurrentSet<string>();
+            
             if (typeCache == null) {
-                var e = new Exception("Could not create type cache.");
-                if(!suppressErrors) Log.Except(e, new TypeId((string) null), includeStackTrace: true);
-                throw e;
+                Throw(kTypeCacheNotCreated, suppressErrors);
+            }
+            
+            if (nonExistentTypes == null) {
+                Throw(kNonExistentTypeSetNotCreated, suppressErrors);
             }
 
             if (typeCache.ContainsKey(name)) return typeCache[name];
+            if (nonExistentTypes.Contains(name)) {
+                Throw(string.Format(kTypeNotFoundFormat, name), suppressErrors);
+            }
             
             var type = Type.GetType(name);
             if (type != null) {
@@ -32,48 +46,33 @@ namespace SerializationSystem.Internal {
             }
 
             try {
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                if (loadedAssemblies == null) {
+                    // Preload all assemblies
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    loadedAssemblies ??= new ConcurrentSet<Assembly>(assemblies.Union(assemblies.SelectMany(assembly => assembly.GetReferencedAssemblies()).Distinct().Select(Assembly.Load)));
+                }
 
                 //To speed things up, we check first in the already loaded assemblies.
-                foreach (var assembly in assemblies) {
+                foreach (var assembly in loadedAssemblies) {
                     type = assembly.GetType(name);
                     if (type == null) continue;
                     
                     typeCache[name] = type;
                     return type;
                 }
-
-                var loadedAssemblies = assemblies.ToList();
-                foreach (var loadedAssembly in assemblies) {
-                    foreach (var referencedAssemblyName in loadedAssembly.GetReferencedAssemblies()) {
-                        if (loadedAssemblies.Any(x => x.GetName() == referencedAssemblyName)) continue;
-                        
-                        try {
-                            var referencedAssembly = Assembly.Load(referencedAssemblyName);
-                            type = referencedAssembly.GetType(name);
-                            if (type != null) {
-                                typeCache[name] = type;
-                                return type;
-                            }
-                            
-                            loadedAssemblies.Add(referencedAssembly);
-                        } catch {
-                            //We will ignore this, because the Type might still be in one of the other Assemblies.
-                        }
-                    }
-                }
             } catch (Exception e) {
                 if(!suppressErrors) Log.Except(e, new TypeId((string)null), includeStackTrace: true);
                 throw;
             }
 
-            if (type != null) {
-                typeCache[name] = type;
-                return type;
-            }
-            
-            var exception = new Exception($"Could not find type {name} in any loaded or referenced assembly.");
-            if(!suppressErrors) Log.Except(exception, new TypeId((string) null), includeStackTrace: true);
+            nonExistentTypes.Add(name);
+            Throw(string.Format(kTypeNotFoundFormat, name), suppressErrors);
+            return null;
+        }
+
+        private static void Throw(string message, bool suppressErrors) {
+            var exception = new Exception(message);
+            if (!suppressErrors) Log.Except(exception, new TypeId((string) null), includeStackTrace: true);
             throw exception;
         }
     }

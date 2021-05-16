@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using SerializationSystem.Internal;
 using SerializationSystem.Logging;
+using Utils;
 
 namespace SerializationSystem {
     public static class Serializer {
@@ -41,6 +42,7 @@ namespace SerializationSystem {
         }
 
         internal static byte[] Serialize(object obj, Type type, Packet packet, SerializeMode serializeMode = SerializeMode.Default) {
+            using var rootBenchmark = new Benchmark($"Serialize Root {type.FullName}");
             if (isSerializationResultReplaced) return new byte[0];
             try {
                 if (SerializeUtils.IsTriviallySerializable(type)) {
@@ -49,7 +51,7 @@ namespace SerializationSystem {
                         Log.Error($"[TRIVIAL] Replacing interface type {type} with {newType}");
                         type = newType;
                     }
-                    
+
                     if (LogOptions.LOG_SERIALIZATION) Log.Info($"[TRIVIAL] Serializing type {SerializeUtils.FriendlyName(type)}", null, "SERIALIZE");
                     var bytes = SerializeTrivialImpl(obj, type, packet, serializeMode).GetBytes();
                     if (LogOptions.LOG_SERIALIZATION) Log.Info($"Serialized type {SerializeUtils.FriendlyName(type)} [{bytes.Length} bytes]", null, "SERIALIZE");
@@ -63,7 +65,11 @@ namespace SerializationSystem {
                 }
 
                 BeforeSerializeCallback(obj, type);
-                if (!HasSerializationModel(type, serializeMode)) BuildSerializationModel(type, serializeMode);
+                if (!HasSerializationModel(type, serializeMode)) {
+                    using var modelCreation = new Benchmark($"Serialization Model {type.FullName}");
+                    BuildSerializationModel(type, serializeMode);
+                }
+
                 if (LogOptions.LOG_SERIALIZATION) Log.Info($"Serializing type {SerializeUtils.FriendlyName(type)}", null, "SERIALIZE");
                 var bytes2 = SerializeImpl(obj, type, packet, serializeMode).GetBytes();
                 if (LogOptions.LOG_SERIALIZATION) Log.Info($"Serialized type {SerializeUtils.FriendlyName(type)} [{bytes2.Length} bytes]", null, "SERIALIZE");
@@ -74,12 +80,13 @@ namespace SerializationSystem {
         }
 
         private static Packet SerializeImpl(object obj, Type type, Packet packet, SerializeMode serializeMode) {
+            using var serialization = new Benchmark($"Serialization {type.FullName}");
             if (type.IsInterface) {
                 var objType = obj.GetType();
                 if (LogOptions.LOG_SERIALIZATION) Log.Warn($"Interface type found {type.FullName}. Serializing using object type {objType.FullName}", null, "SERIALIZE");
                 return SerializeImpl(obj, objType, packet, serializeMode);
             }
-            
+
             var typeId = type.ID();
             packet.WriteTypeId(typeId);
             packet.Write(serializeMode, SerializeMode.Default);
@@ -95,6 +102,7 @@ namespace SerializationSystem {
                     fieldType = newType;
                     packet.WriteTypeId(fieldType.ID());
                 }
+
                 packet.Write(fieldType, value, serializeMode);
             }
 
@@ -102,6 +110,7 @@ namespace SerializationSystem {
         }
 
         private static Packet SerializeTrivialImpl(object obj, Type type, Packet packet, SerializeMode serializeMode) {
+            using var trivialSerializable = new Benchmark($"Serialize Trivial {type.FullName}");
             var typeId = type.ID();
             packet.WriteTypeId(typeId);
             packet.Write(serializeMode, SerializeMode.Default);
@@ -121,7 +130,7 @@ namespace SerializationSystem {
                     if (type.IsInterface) {
                         Log.Error($"Found interface type when wasn't expecting: {type}");
                     }
-                    
+
                     if (LogOptions.LOG_SERIALIZATION) Log.Info($"[TRIVIAL] Deserializing type {SerializeUtils.FriendlyName(type)}", null, "SERIALIZE");
                     var objTrivial = DeserializeTrivialImpl(packet, type, serializeMode);
                     AfterDeserializeCallback(objTrivial, type);
@@ -154,6 +163,7 @@ namespace SerializationSystem {
                     if (LogOptions.LOG_SERIALIZATION) Log.Warn($"Interface type found {fieldType.FullName}. Deserializing using object type {newType.FullName}", null, "SERIALIZE");
                     fieldType = newType;
                 }
+
                 var value = packet.Read(fieldType, serializeMode);
                 field.SetValue(instance, value);
             }
@@ -178,6 +188,7 @@ namespace SerializationSystem {
         }
 
         private static void BeforeSerializeCallback(object obj, Type type) {
+            using var beforeSerializeCallback = new Benchmark($"BeforeSerializeCallback {type.FullName}");
             if (typeof(ISerializationCallback).IsAssignableFrom(type)) {
                 var method = type.GetMethod("OnBeforeSerialize");
                 System.Diagnostics.Debug.Assert(method != null);

@@ -2,37 +2,45 @@
 using System.Collections.Generic;
 using System.IO;
 using Google.Protobuf;
-using Google.Protobuf.Collections;
 using SerializationSystem;
 using SerializationSystem.Logging;
 using UnityCommons;
-using CodedOutputStream = Google.Protobuf.CodedOutputStream;
+using Utils;
 using proto = Protocol.Protobuf;
 using custom = Protocol.Custom;
 
 namespace protobuf {
     public static class Example3 {
-        const int itemCount = 1024;
+        const int itemCount = 16;
 
         public static void Run() {
             LogOptions.LogSerialization = false;
             var seed = Rand.Int;
-            
-            Rand.PushState(seed);
-            var customPlayer = MakeCustomPlayerData();
-            Rand.PopState();
-            Rand.PushState(seed);
-            var protoPlayer = MakeProtoPlayerData();
-            Rand.PopState();
 
-            using (var memoryStream = new MemoryStream()) {
+            var memoryStream = new MemoryStream();
+            Benchmark.Run("Proto serialization", () => {
+                Rand.PushState(seed);
+                var protoPlayer = MakeProtoPlayerData();
+                Rand.PopState();
+                memoryStream.SetLength(0);
                 protoPlayer.WriteTo(memoryStream);
-                var protoBytes = memoryStream.Length;
-                Console.WriteLine($"Proto bytes: {protoBytes}");
-            }
+            }, 2);
 
-            var customBytes = Serializer.Serialize(customPlayer);
-            Console.WriteLine($"Custom bytes: {customBytes.Length}");
+            Benchmark.Run("Custom serialization", () => {
+                Rand.PushState(seed);
+                var customPlayer = MakeCustomPlayerData();
+                Rand.PopState();
+                Serializer.Serialize(customPlayer);
+                Console.WriteLine($"\n\n\n\n");
+            }, 2);
+
+            // memoryStream.SetLength(0);
+            // protoPlayer.WriteTo(memoryStream);
+            // var protoBytes = memoryStream.Length;
+            // var customBytes = Serializer.Serialize(customPlayer);
+
+            // Console.WriteLine($"Proto: \nsize: {protoBytes} bytes");
+            // Console.WriteLine($"Custom: \nsize: {customBytes.Length} bytes");
         }
 
         private static proto::PlayerData MakeProtoPlayerData() {
@@ -115,7 +123,7 @@ namespace protobuf {
 
             return new proto::ItemStack {Item = item, Count = count};
         }
-        
+
         private static custom::PlayerData MakeCustomPlayerData() {
             var name = new Guid(Rand.Bytes(16)).ToString();
             var transform = new custom::Transform {
@@ -155,7 +163,6 @@ namespace protobuf {
             };
         }
 
-
         private static custom::ItemStack MakeCustomItem() {
             var count = (uint) Rand.Int;
 
@@ -175,15 +182,18 @@ namespace protobuf {
                     // ArmorStats
                     var protection = (uint) Rand.Int;
                     var blockChance = Rand.Float;
-                    item = new custom::ArmorItemData
-                        {Name = name, Type = type, Rarity = rarity, Durability = durability, MaxDurability = maxDurability, Level = level, Protection = protection, BlockChance = blockChance};
+                    item = new custom::ArmorItemData {
+                        Name = name, Type = type, Rarity = rarity, Durability = durability, MaxDurability = maxDurability, Level = level, Protection = protection,
+                        BlockChance = blockChance
+                    };
                     break;
                 case 1:
                     // WeaponStats
                     var damage = (uint) Rand.Int;
                     var critChance = Rand.Float;
-                    item = new custom::WeaponItemData
-                        {Name = name, Type = type, Rarity = rarity, Durability = durability, MaxDurability = maxDurability, Level = level, Damage = damage, CritChance = critChance};
+                    item = new custom::WeaponItemData {
+                        Name = name, Type = type, Rarity = rarity, Durability = durability, MaxDurability = maxDurability, Level = level, Damage = damage, CritChance = critChance
+                    };
                     break;
                 case 2:
                     // PotionStats
@@ -191,7 +201,8 @@ namespace protobuf {
                     var statusEffect = (uint) Rand.Int;
                     var statusMultiplier = Rand.Float;
                     item = new custom::PotionItemData {
-                        Name = name, Type = type, Rarity = rarity, Durability = durability, MaxDurability = maxDurability, Level = level, Duration = durationMs, StatusEffect = statusEffect,
+                        Name = name, Type = type, Rarity = rarity, Durability = durability, MaxDurability = maxDurability, Level = level, Duration = durationMs,
+                        StatusEffect = statusEffect,
                         StatusMultiplier = statusMultiplier
                     };
                     break;
