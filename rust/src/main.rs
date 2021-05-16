@@ -169,4 +169,6 @@ fn main() {
     println!();
 
     structs::run();
+
+    // Last tutorial https://tourofrust.com/33_en.html
 }
